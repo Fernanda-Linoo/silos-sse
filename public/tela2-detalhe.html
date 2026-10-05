@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Telemetria detalhada — Agro-Monitoring Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo azul">
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 16v-4M12 16V8M16 16v-6"/></svg>
+      <span id="titulo">Telemetria detalhada</span>
+    </h1>
+    <div class="topo-acoes">
+      <label class="sr-only" for="sel-silo">Trocar de silo</label>
+      <select id="sel-silo" class="select-topo"></select>
+      <span class="etiqueta" id="grau-risco">—</span>
+      <button type="button" class="botao-topo" id="btn-som"></button>
+      <span class="badge-sse" id="badge-sse" data-estado="conectando" role="status" aria-live="polite">
+        <span class="ponto"></span><span class="texto">Conectando…</span>
+      </span>
+    </div>
+  </header>
+
+  <section class="notificacoes" id="notificacoes" aria-live="assertive"></section>
+
+  <main>
+    <div class="layout-detalhe">
+      <section class="painel">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 20V8l6-5 6 5v12z"/></svg>
+          Esquema de corte transversal do silo
+        </h2>
+        <div class="svg-area" id="svg-area" role="img" aria-label="Corte transversal do silo"></div>
+        <div class="legenda-termo" aria-hidden="true">
+          <span><i style="background:#2e9e5b"></i>Normal</span>
+          <span><i style="background:#e0a100"></i>≥ limite exaustor</span>
+          <span><i style="background:#c62828"></i>≥ limite crítico</span>
+          <span><i style="background:#7a7f7c"></i>ERR (termopar rompido)</span>
+        </div>
+      </section>
+
+      <section class="painel">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8a6 6 0 0 1 0 8.4M7.8 16.2a6 6 0 0 1 0-8.4M19 5a10 10 0 0 1 0 14M5 19A10 10 0 0 1 5 5"/></svg>
+          Leituras em tempo real (EventStream)
+        </h2>
+        <ul class="leituras" id="leituras" aria-live="off"></ul>
+
+        <div class="dados-lote">
+          <div><span>Capacidade total</span><strong id="d-capacidade">—</strong></div>
+          <div><span>Grão</span><strong id="d-grao">—</strong></div>
+          <div><span>Umidade média</span><strong id="d-umidade">—</strong></div>
+        </div>
+
+        <div class="grafico-titulo">
+          <span>Histórico das últimas 24 horas</span>
+          <span class="legenda"><b style="background:#c62828"></b>Temperatura (°C)<b style="background:#0d3b66"></b>CO₂ (ppm)</span>
+        </div>
+        <canvas id="grafico" role="img" aria-label="Gráfico de temperatura e CO₂ nas últimas 24 horas"></canvas>
+
+        <div class="acoes-detalhe">
+          <a class="botao cinza" href="tela1-dashboard.html">← Voltar ao dashboard</a>
+          <a class="botao verde" id="btn-controle" href="tela3-controle.html">Acessar controle de atuadores</a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script src="js/comum.js"></script>
+  <script src="js/sse-client.js"></script>
+  <script src="js/detalhe.js"></script>
+</body>
+</html>

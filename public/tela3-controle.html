@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Parametrização e controle de atuadores — Agro-Monitoring Pro</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg>
+      Parametrização de alertas e controle de atuadores
+    </h1>
+    <div class="topo-acoes">
+      <label class="sr-only" for="sel-silo">Silo selecionado</label>
+      <select id="sel-silo" class="select-topo"></select>
+      <span class="badge-sse" id="badge-sse" data-estado="conectando" role="status" aria-live="polite">
+        <span class="ponto"></span><span class="texto">Conectando…</span>
+      </span>
+    </div>
+  </header>
+
+  <main>
+    <div class="layout-controle">
+      <!-- Limiares -->
+      <section class="painel">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg>
+          Definição de limiares de alerta
+        </h2>
+        <form id="form-config" novalidate>
+          <div class="campo">
+            <label for="c-temp-exaustor">Temperatura para ligar exaustores</label>
+            <div class="entrada"><input id="c-temp-exaustor" name="tempExaustor" type="number" step="0.1" min="10" max="60" required><span class="unidade">°C</span></div>
+          </div>
+          <div class="campo">
+            <label for="c-temp-critica">Temperatura crítica (alarme sonoro)</label>
+            <div class="entrada"><input id="c-temp-critica" name="tempCritica" type="number" step="0.1" min="10" max="80" required><span class="unidade">°C</span></div>
+          </div>
+          <div class="campo">
+            <label for="c-co2-alerta">CO₂ para alerta visual</label>
+            <div class="entrada"><input id="c-co2-alerta" name="co2Alerta" type="number" step="10" min="400" max="5000" required><span class="unidade">ppm</span></div>
+          </div>
+          <div class="campo">
+            <label for="c-co2-critico">CO₂ para abrir comporta automaticamente</label>
+            <div class="entrada"><input id="c-co2-critico" name="co2Critico" type="number" step="10" min="400" max="5000" required><span class="unidade">ppm</span></div>
+            <small>Os limiares valem para todos os silos em modo automático.</small>
+          </div>
+          <button type="submit" class="botao verde" style="width:100%">💾 Salvar configurações</button>
+          <p class="mensagem-form" id="msg-config" role="status"></p>
+        </form>
+      </section>
+
+      <!-- Comandos -->
+      <section class="painel">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><circle cx="12" cy="9" r="2"/><path d="M9 15h6M9 18h6"/></svg>
+          <span id="titulo-comando">Comando manual</span>
+        </h2>
+
+        <div class="campo">
+          <label for="operador">Operador responsável</label>
+          <div class="entrada"><input id="operador" type="text" value="OP-882" maxlength="20" autocomplete="off"></div>
+        </div>
+
+        <div class="chave-modo" id="chave-modo">
+          <div>
+            <strong id="modo-texto">Modo automático</strong>
+            <small id="modo-ajuda">Rotinas de segurança ativas. Comandos manuais travados.</small>
+          </div>
+          <label class="interruptor">
+            <span class="sr-only">Ativar modo manual</span>
+            <input type="checkbox" id="toggle-modo" role="switch">
+            <span></span>
+          </label>
+        </div>
+
+        <div class="aviso chuva oculto" id="aviso-chuva">🌧️ Sensor de chuva ativo: abertura da comporta bloqueada.</div>
+        <div class="aviso oculto" id="feedback" role="alert"></div>
+
+        <div class="atuador">
+          <span class="lampada" id="l-comporta" aria-hidden="true"></span>
+          <div class="nome"><strong>Comporta principal</strong><small id="s-comporta">—</small></div>
+          <div class="botoes">
+            <button type="button" class="botao verde pequeno cmd" data-cmd="comportaComando" data-valor="ABRIR">Abrir comporta</button>
+            <button type="button" class="botao cinza pequeno cmd" data-cmd="comportaComando" data-valor="FECHAR">Fechar</button>
+          </div>
+        </div>
+        <div class="atuador">
+          <span class="lampada" id="l-exaustor1" aria-hidden="true"></span>
+          <div class="nome"><strong>Exaustor térmico 01</strong><small id="s-exaustor1">—</small></div>
+          <div class="botoes">
+            <button type="button" class="botao verde pequeno cmd" data-cmd="exaustorComando" data-valor="LIGAR">Ligar exaustor</button>
+            <button type="button" class="botao cinza pequeno cmd" data-cmd="exaustorComando" data-valor="DESLIGAR">Desligar</button>
+          </div>
+        </div>
+        <div class="atuador">
+          <span class="lampada" id="l-exaustor2" aria-hidden="true"></span>
+          <div class="nome"><strong>Exaustor térmico 02</strong><small id="s-exaustor2">—</small></div>
+          <div class="botoes">
+            <button type="button" class="botao verde pequeno cmd" data-cmd="exaustor2Comando" data-valor="LIGAR">Ligar exaustor</button>
+            <button type="button" class="botao cinza pequeno cmd" data-cmd="exaustor2Comando" data-valor="DESLIGAR">Desligar</button>
+          </div>
+        </div>
+
+        <p class="mensagem-form" id="leitura-resumo"></p>
+
+        <div class="rodape-acoes">
+          <a class="botao cinza" href="tela1-dashboard.html" style="width:100%">← Retornar ao dashboard global</a>
+        </div>
+      </section>
+
+      <!-- Log -->
+      <section class="painel painel-log">
+        <h2>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/></svg>
+          Log de eventos (últimas 20 ocorrências)
+        </h2>
+        <ul class="terminal" id="terminal" aria-live="polite"></ul>
+        <div class="status-motor">
+          <div><span>Taxa de eventos SSE</span><strong id="st-taxa">—</strong></div>
+          <div><span>Conexões ativas</span><strong id="st-clientes">—</strong></div>
+        </div>
+      </section>
+    </div>
+
+    <details class="demo">
+      <summary>Ferramentas de demonstração (simulação de cenários)</summary>
+      <p>Disparam no servidor os fluxos alternativos e de exceção da especificação para o silo selecionado. Servem apenas para apresentação; em produção esses eventos viriam do campo.</p>
+      <div class="demo-botoes">
+        <button type="button" class="botao contorno pequeno" data-cenario="superaquecimento">Pico térmico (≥ 35 °C)</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="co2">Pico de CO₂ (≥ 1500 ppm)</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="chuva">Alternar sensor de chuva</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="sobrecarga">Sobrecarga no Exaustor 01</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="reset-exaustor">Reset presencial dos exaustores</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="falha-comunicacao">Perda de sinal do CLP (20 s)</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="termopar">Romper termopar do meio</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="descarregar">Descarregar silo</button>
+        <button type="button" class="botao contorno pequeno" data-cenario="normalizar">Normalizar leituras</button>
+      </div>
+    </details>
+  </main>
+
+  <script src="js/comum.js"></script>
+  <script src="js/sse-client.js"></script>
+  <script src="js/controle.js"></script>
+</body>
+</html>

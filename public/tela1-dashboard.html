@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agro-Monitoring Pro — Visão geral de armazém</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topo">
+    <h1>
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V9l8-6 8 6v12"/><path d="M4 9h16"/><path d="M9 21v-6h6v6"/></svg>
+      Agro-Monitoring Pro — Visão geral de armazém
+    </h1>
+    <div class="topo-acoes">
+      <button type="button" class="botao-topo" id="btn-som"></button>
+      <span class="badge-sse" id="badge-sse" data-estado="conectando" role="status" aria-live="polite">
+        <span class="ponto"></span><span class="texto">Conectando…</span>
+      </span>
+    </div>
+  </header>
+
+  <section class="notificacoes" id="notificacoes" aria-live="assertive"></section>
+
+  <main>
+    <div class="filtros" role="toolbar" aria-label="Filtros">
+      <div class="grupo" role="group" aria-label="Nível de risco">
+        <button type="button" data-risco="TODOS" aria-pressed="true">Todos os silos</button>
+        <button type="button" data-risco="ALERTAS" aria-pressed="false">Apenas alertas</button>
+      </div>
+      <label class="sr-only" for="filtro-grao">Tipo de grão</label>
+      <select id="filtro-grao">
+        <option value="TODOS">Todos os grãos</option>
+        <option value="MILHO">Milho</option>
+        <option value="SOJA">Soja</option>
+        <option value="TRIGO">Trigo</option>
+      </select>
+      <span class="resumo" id="resumo"></span>
+    </div>
+
+    <div class="grade" id="grade">
+      <p class="vazio">Aguardando a primeira leitura dos sensores…</p>
+    </div>
+  </main>
+
+  <template id="tpl-card">
+    <article class="card-silo" tabindex="0">
+      <div class="card-cabecalho">
+        <h2><span data-c="nome"></span><span class="grao" data-c="grao"></span></h2>
+        <div class="etiquetas">
+          <span class="etiqueta" data-c="status"></span>
+          <span class="etiqueta info oculto" data-c="carga"></span>
+        </div>
+      </div>
+      <div class="falha-comunicacao">[Falha de Comunicação - Check Hardware]</div>
+      <div class="nivel">
+        <div class="nivel-linha"><span>Nível de ocupação</span><span data-c="nivel"></span></div>
+        <div class="barra" data-c="barra"><span></span></div>
+      </div>
+      <dl class="metricas">
+        <div class="metrica" data-m="temp"><dt>Temperatura (máx.)</dt><dd data-c="temp"></dd></div>
+        <div class="metrica"><dt>Umidade</dt><dd data-c="umidade"></dd></div>
+        <div class="metrica" data-m="co2"><dt>Concentração CO₂</dt><dd data-c="co2"></dd></div>
+        <div class="metrica metrica-atuador"><dt>Exaustor / Comporta</dt><dd data-c="atuadores"></dd></div>
+      </dl>
+      <div class="tendencia">
+        <span>Tendência °C</span>
+        <canvas data-c="spark" height="36" aria-hidden="true"></canvas>
+      </div>
+      <div class="card-rodape">
+        <a class="botao" data-c="detalhe">Ver detalhes</a>
+        <a class="botao contorno" data-c="controle">Atuadores</a>
+      </div>
+    </article>
+  </template>
+
+  <script src="js/comum.js"></script>
+  <script src="js/sse-client.js"></script>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
